@@ -16,7 +16,11 @@ def main():
     if request.method == 'GET':
         return request.args.get('code')
     elif request.method == 'POST':
-        return request.args.get('code')
+        json = request.get_json()
+        if len(json['code']) == 0:
+            return jsonify({'error': 'invalid input'})
+
+        return jsonify({'you sent this': json['code']})
     else:
         return "ok"
 
