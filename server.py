@@ -1,4 +1,6 @@
 from flask import Flask, jsonify, request
+import logging
+
 app = Flask(__name__)
 
 result = [
@@ -12,9 +14,9 @@ result = [
 @app.route('/api', methods=['GET', 'POST'])
 def main():
     if request.method == 'GET':
-        return 'GET'
+        return request.args.get('code')
     elif request.method == 'POST':
-        return jsonify({'result': request})
+        return request.args.get('code')
     else:
         return "ok"
 
