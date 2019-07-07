@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from database import get_database, Database
 
 import json
+import MySQLdb
 
 app = Flask(__name__)
 
@@ -10,7 +11,12 @@ app = Flask(__name__)
 def main():
 
     if request.method == 'GET':
-
+        myDB = MySQLdb.connect(host="208.11.220.249", port=3306, user="XXXXX", passwd="XXXXX", db="XXXXX")
+        cHandler = myDB.cursor()
+        cHandler.execute("SHOW DATABASES")
+        results = cHandler.fetchall()
+        for items in results:
+            print(items[0])
         #with open("db.cnf") as f:
         #    config = json.load(f)
 
