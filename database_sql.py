@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-from itertools import izip_longest
-import Queue
+from itertools import zip_longest
+import queue
 import datetime
 import logging
 
@@ -314,16 +314,16 @@ class SQLDatabase(Database):
         for hash, offset in hashes:
             if len(hash_repeat[hash]) > 1:
                 msg = ("Finding repeat hash %s with %s offsets" % (hash, len(hash_repeat[hash])))
-                print msg
+                print(msg)
                 self.logger.info(msg)
                 
                 msg = ("Writing to db hash %s and offset %s" % (hash, min(hash_repeat[hash])))
-                print msg
+                print(msg)
                 self.logger.info(msg)
 
                 values.append((hash, sid, min(hash_repeat[hash])))
                 msg = "-------------------hash_repeat-----------------"
-                print msg
+                print(msg)
                 self.logger.info(msg)
 
         with self.cursor() as cur:
@@ -367,7 +367,7 @@ class SQLDatabase(Database):
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return (filter(None, values) for values
-            in izip_longest(fillvalue=fillvalue, *args))
+            in zip_longest(fillvalue=fillvalue, *args))
 
 
 def cursor_factory(**factory_options):
