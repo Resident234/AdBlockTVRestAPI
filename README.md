@@ -47,7 +47,7 @@ Set Flask server visible from public ip address (tested in ubuntu 18):
 
 2) Set dynamic dns in router settings https://prnt.sc/o5jnxp
 
-3) Set port forwarding in router settings https://prnt.sc/o5jlyk (more details https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/)
+3) Set port forwarding in router settings https://prnt.sc/oz9xvz (more details https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/)
 
 4) Install Dynamic Update Client (see more https://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/)
 
