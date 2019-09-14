@@ -57,3 +57,70 @@ Set Flask server visible from public ip address (tested in ubuntu 18):
 
 
 A stackoverflow question that helped https://stackoverflow.com/questions/36597643/flask-server-not-visible-from-my-public-ip-address
+
+
+
+DB
+
+To connect to instance using SSH:
+ssh -i /home/gsu/Downloads/dejavu.pem ec2-user@ec2-3-16-131-11.us-east-2.compute.amazonaws.com
+
+https://prnt.sc/p4dexy 
+
+http://ec2-3-16-131-11.us-east-2.compute.amazonaws.com/phpinfo.php
+
+http://ec2-3-16-131-11.us-east-2.compute.amazonaws.com/phpMyAdmin/
+
+
+# ec2-3-16-131-11.us-east-2.compute.amazonaws.com db connection config :
+# login : root
+# password : Po8WuX?v0B9inO6UMOpr
+
+
+mysql -u root -pPo8WuX?v0B9inO6UMOpr
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY ‘Po8WuX?v0B9inO6UMOpr’;
+FLUSH PRIVILEGES;
+exit
+
+1. Add MySQL to inbound rules.
+Go to security group of your ec2 instance -> edit inbound rules -> add new rule -> choose MySQL/Aurora and source to Anywhere.
+
+
+2. Add bind-address = 0.0.0.0 to my.cnf
+In instance console:
+
+sudo vi /etc/my.cnf
+this will open vi editor.
+in my.cnf file, after [mysqld] add new line and write this:
+
+bind-address = 0.0.0.0
+Save file by entering :wq(enter)
+
+now restart MySQL:
+sudo systemctl restart mariadb
+sudo chkconfig mariadb on
+
+3. Create a remote user and grant privileges.
+login to MySQL:
+
+mysql -u root -pPo8WuX?v0B9inO6UMOpr
+
+Now write following commands:
+
+GRANT ALL PRIVILEGES ON *.* to root@localhost IDENTIFIED BY 'Po8WuX?v0B9inO6UMOpr' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES ON *.* to root@'%' IDENTIFIED BY 'Po8WuX?v0B9inO6UMOpr' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
+EXIT;
+
+After this, MySQL dB can be remotely accessed by entering public dns/ip of your instance as MySQL Host Address, username as root and password as Po8WuX?v0B9inO6UMOpr;. (Port is set to default at 3306)
+
+
+
+Run command on server with flask :
+
+setsebool -P httpd_can_network_connect_db=1
+sudo apt-get install mysql-server
+mysql -u root -h 3.16.131.11 -p
