@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import abc
-import logger
 
 class Database(object):
     __metaclass__ = abc.ABCMeta
@@ -173,4 +172,4 @@ def get_database(database_type=None):
 
 
 # Import our default database handler
-import database_sql
+import dejavu.database_sql

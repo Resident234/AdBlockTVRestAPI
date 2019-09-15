@@ -5,6 +5,13 @@ import json
 import pymysql
 #import MySQLdb
 
+from dejavu import Dejavu
+import dejavu.logger as logger
+
+with open("dejavu.cnf") as f:
+    config = json.load(f)
+
+
 app = Flask(__name__)
 
 # ec2-3-16-131-11.us-east-2.compute.amazonaws.com db connection config :
@@ -13,38 +20,26 @@ app = Flask(__name__)
 
 @app.route('/api', methods=['GET', 'POST'])
 def main():
-
+    djv = Dejavu(config)
+    '''
+    connection = pymysql.connect(host='3.16.131.11',
+                                 user='root',
+                                 password='Po8WuX?v0B9inO6UMOpr',
+                                 db='dejavu',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)'''
     if request.method == 'GET':
-        connection = pymysql.connect(host='3.16.131.11',
-                                     user='root',
-                                     password='Po8WuX?v0B9inO6UMOpr',
-                                     db='dejavu',
-                                     charset='utf8mb4',
-                                     cursorclass=pymysql.cursors.DictCursor)
-        '''
-        try:
-            with connection.cursor() as cursor:
-                # SQL
-                sql = "SELECT Dept_No, Dept_Name FROM Department "
-                # Execute query.
-                cursor.execute(sql)
-                print("cursor.description: ", cursor.description)
-                print()
-
-                for row in cursor:
-                    print(row)
-        finally:
-            # Close connection.
-            connection.close()
-        '''
-
-        return("connect successful!!")
+        return "count records in db: %s" % djv.get_num_songs()
     elif request.method == 'POST':
         json_local = request.get_json()
         if len(json_local['code']) == 0:
             return jsonify({'error': 'invalid input'})
-        #db.return_matches(json['code'])
-        return jsonify({'you sent this': json_local['code']})
+
+        matches = []
+        matches.extend(djv.find_hashes(json['code']))
+        return jsonify({'result': djv.align_matches(matches)})
+
+        #return jsonify({'you sent this': json_local['code']})
     else:
         return "ok"
 

@@ -1,8 +1,8 @@
 import logging
 import datetime
 
-
 def get_logger(name):
+
     level = logging.INFO
 
     log_file = "logs/" + name + datetime.datetime.now().strftime("%Y-%m-%d") + ".log"

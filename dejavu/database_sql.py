@@ -4,14 +4,15 @@ import queue
 import datetime
 import logging
 
-import MySQLdb as mysql
-from MySQLdb.cursors import DictCursor
+import pymysql
+import pymysql.cursors
 
-from database import Database
+from dejavu.database import Database
 
 from collections import defaultdict
 
-import logger
+#import dejavu.logger as logger
+
 
 class SQLDatabase(Database):
     """
@@ -113,7 +114,8 @@ class SQLDatabase(Database):
 
     SELECT_SONG = """
         SELECT %s, HEX(%s) as %s FROM %s WHERE %s = %%s;
-    """ % (Database.FIELD_SONGNAME, Database.FIELD_FILE_SHA1, Database.FIELD_FILE_SHA1, SONGS_TABLENAME, Database.FIELD_SONG_ID)
+    """ % (Database.FIELD_SONGNAME, Database.FIELD_FILE_SHA1, Database.FIELD_FILE_SHA1, SONGS_TABLENAME,
+           Database.FIELD_SONG_ID)
 
     SELECT_NUM_FINGERPRINTS = """
         SELECT COUNT(*) as n FROM %s
@@ -146,7 +148,6 @@ class SQLDatabase(Database):
         super(SQLDatabase, self).__init__()
         self.cursor = cursor_factory(**options)
         self._options = options
-        self.logger = logger.get_logger('dejavu_process_logger')
 
     def after_fork(self):
         # Clear the cursor cache, we don't want any stale connections from
@@ -316,7 +317,7 @@ class SQLDatabase(Database):
                 msg = ("Finding repeat hash %s with %s offsets" % (hash, len(hash_repeat[hash])))
                 print(msg)
                 self.logger.info(msg)
-                
+
                 msg = ("Writing to db hash %s and offset %s" % (hash, min(hash_repeat[hash])))
                 print(msg)
                 self.logger.info(msg)
@@ -329,7 +330,6 @@ class SQLDatabase(Database):
         with self.cursor() as cur:
             for split_values in grouper(values, 1000):
                 cur.executemany(self.INSERT_FINGERPRINT, split_values)
-
 
     def return_matches(self, hashes):
         """
@@ -374,6 +374,7 @@ def cursor_factory(**factory_options):
     def cursor(**options):
         options.update(factory_options)
         return Cursor(**options)
+
     return cursor
 
 
@@ -388,15 +389,15 @@ class Cursor(object):
         cur.execute(query)
     ```
     """
-    _cache = Queue.Queue(maxsize=5)
+    _cache = queue.Queue(maxsize=5)
 
-    def __init__(self, cursor_type=mysql.cursors.Cursor, **options):
+    def __init__(self, cursor_type=pymysql.cursors.Cursor, **options):
         super(Cursor, self).__init__()
 
         try:
             conn = self._cache.get_nowait()
-        except Queue.Empty:
-            conn = mysql.connect(**options)
+        except queue.Empty:
+            conn = pymysql.connect(**options)
         else:
             # Ping the connection before using it from the cache.
             conn.ping(True)
@@ -407,7 +408,7 @@ class Cursor(object):
 
     @classmethod
     def clear_cache(cls):
-        cls._cache = Queue.Queue(maxsize=5)
+        cls._cache = queue.Queue(maxsize=5)
 
     def __enter__(self):
         self.cursor = self.conn.cursor(self.cursor_type)
@@ -415,7 +416,7 @@ class Cursor(object):
 
     def __exit__(self, extype, exvalue, traceback):
         # if we had a MySQL related error we try to rollback the cursor.
-        if extype is mysql.MySQLError:
+        if extype is pymysql.MySQLError:
             self.cursor.rollback()
 
         self.cursor.close()
@@ -424,5 +425,5 @@ class Cursor(object):
         # Put it back on the queue
         try:
             self._cache.put_nowait(self.conn)
-        except Queue.Full:
+        except queue.Full:
             self.conn.close()
