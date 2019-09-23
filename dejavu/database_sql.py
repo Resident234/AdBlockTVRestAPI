@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+
+import pickle
 from itertools import zip_longest
 import queue
 import datetime
@@ -11,7 +13,8 @@ from dejavu.database import Database
 
 from collections import defaultdict
 
-#import dejavu.logger as logger
+
+# import dejavu.logger as logger
 
 
 class SQLDatabase(Database):
@@ -338,14 +341,17 @@ class SQLDatabase(Database):
         """
         # Create a dictionary of hash => offset pairs for later lookups
         mapper = {}
+        values = []
         for hash, offset in hashes:
             mapper[hash.upper()] = offset
-
+            values.append(hash.upper())
         # Get an iteratable of all the hashes we need
-        values = mapper.keys()
+        # values = mapper.keys()
 
         with self.cursor() as cur:
             for split_values in grouper(values, 1000):
+                split_values = list(split_values)
+
                 # Create our IN part of the query
                 query = self.SELECT_MULTIPLE
                 query = query % ', '.join(['UNHEX(%s)'] * len(split_values))
@@ -364,10 +370,18 @@ class SQLDatabase(Database):
         self.cursor = cursor_factory(**self._options)
 
 
+def notNone(variable):
+    if variable is None:
+        return False
+    else:
+        return True
+
+
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
+    # return zip_longest(*args, fillvalue=fillvalue)
     return (filter(None, values) for values
-            in zip_longest(fillvalue=fillvalue, *args))
+            in zip_longest(*args, fillvalue=fillvalue))
 
 
 def cursor_factory(**factory_options):

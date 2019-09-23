@@ -38,7 +38,7 @@ class Dejavu(object):
     def get_num_songs(self):
         return self.db.get_num_songs()
 
-    def find_hashes(self, hashes):
+    def rest_find_matches(self, hashes):
         return self.db.return_matches(hashes)
 
     def align_matches(self, matches):
@@ -86,10 +86,6 @@ class Dejavu(object):
             Dejavu.OFFSET_SECS: nseconds,
             Database.FIELD_FILE_SHA1: song.get(Database.FIELD_FILE_SHA1, None), }
         return song
-
-    def find_hashes(self, hashes, *options, **kwoptions):
-        r = recognizer(self)
-        return r.recognize(*options, **kwoptions)
 
 def chunkify(lst, n):
     """
