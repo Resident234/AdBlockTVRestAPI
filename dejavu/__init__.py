@@ -85,6 +85,7 @@ class Dejavu(object):
             Dejavu.OFFSET: int(largest),
             Dejavu.OFFSET_SECS: nseconds,
             Database.FIELD_FILE_SHA1: song.get(Database.FIELD_FILE_SHA1, None), }
+
         return song
 
 def chunkify(lst, n):

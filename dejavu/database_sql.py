@@ -251,7 +251,7 @@ class SQLDatabase(Database):
         """
         Returns song by its ID.
         """
-        with self.cursor(cursor_type=DictCursor) as cur:
+        with self.cursor(cursor_type=pymysql.cursors.DictCursor) as cur:
             cur.execute(self.SELECT_SONG, (sid,))
             return cur.fetchone()
 
