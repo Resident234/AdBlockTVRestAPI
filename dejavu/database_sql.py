@@ -242,7 +242,7 @@ class SQLDatabase(Database):
         """
         Return songs that have the fingerprinted flag set TRUE (1).
         """
-        with self.cursor(cursor_type=DictCursor) as cur:
+        with self.cursor(cursor_type=pymysql.cursors.DictCursor) as cur:
             cur.execute(self.SELECT_SONGS)
             for row in cur:
                 yield row
@@ -380,7 +380,7 @@ def notNone(variable):
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     # return zip_longest(*args, fillvalue=fillvalue)
-    return (filter(None, values) for values
+    return list(filter(None, values) for values
             in zip_longest(*args, fillvalue=fillvalue))
 
 

@@ -38,14 +38,11 @@ def main():
                 samples_indexes.append(sample_index)
         file_log.close()
 
-        f = open("dict.txt", "w")
-        f.write(str(samples_indexes))
-        f.close()
-
         matches = []
         for sample_index in samples_indexes:
             matches.extend(djv.rest_find_matches(hashes[sample_index]))
-        #return djv.align_matches(matches)
+
+        return djv.align_matches(matches)
         return "count records in db: %s" % djv.get_num_songs()
     elif request.method == 'POST':
         json_local = request.get_json()
