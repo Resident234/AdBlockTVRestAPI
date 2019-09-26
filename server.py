@@ -41,13 +41,14 @@ def main():
         matches = []
         for sample_index in samples_indexes:
             matches.extend(djv.rest_find_matches(hashes[sample_index]))
-        f = open("dict.txt", "w")
-        f.write(str(djv.align_matches(matches)))
-        f.close()
+
         return str(djv.align_matches(matches))
         return "count records in db: %s" % djv.get_num_songs()
     elif request.method == 'POST':
         json_local = request.get_json()
+        f = open("dict.txt", "w")
+        f.write(str(json_local))
+        f.close()
         if len(json_local['code']) == 0:
             return jsonify({'error': 'invalid input'})
 
